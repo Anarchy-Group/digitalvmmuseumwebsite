@@ -3,15 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Virtual Machine - Operating System Museum</title>
+
+<title>Operating System Museum - Virtual Machine</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<script src="https://copy.sh/v86/build/libv86.js"></script>
+<script src="/v86/libv86.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 *{
 margin:0;
 padding:0;
@@ -34,6 +38,7 @@ font-family:'Inter',sans-serif;
 background:var(--bg);
 color:var(--text);
 overflow-x:hidden;
+min-height:100vh;
 }
 
 body::before{
@@ -41,21 +46,23 @@ content:'';
 position:fixed;
 width:700px;
 height:700px;
-background:radial-gradient(circle,rgba(124,58,237,0.18),transparent 70%);
+background:radial-gradient(circle,rgba(124,58,237,0.2),transparent 70%);
 top:-300px;
 right:-200px;
 z-index:-2;
+pointer-events:none;
 }
 
 body::after{
 content:'';
 position:fixed;
-width:600px;
-height:600px;
+width:650px;
+height:650px;
 background:radial-gradient(circle,rgba(6,182,212,0.15),transparent 70%);
 bottom:-250px;
-left:-150px;
+left:-200px;
 z-index:-2;
+pointer-events:none;
 }
 
 header{
@@ -63,7 +70,7 @@ position:sticky;
 top:0;
 z-index:1000;
 backdrop-filter:blur(20px);
-background:rgba(5,5,5,0.7);
+background:rgba(5,5,5,0.72);
 border-bottom:1px solid var(--border);
 }
 
@@ -74,17 +81,18 @@ padding:22px 24px;
 display:flex;
 align-items:center;
 justify-content:space-between;
+gap:20px;
 }
 
 .logo h1{
-font-size:30px;
+font-size:34px;
 font-weight:900;
 }
 
 .logo p{
-margin-top:4px;
+margin-top:6px;
 color:var(--muted);
-font-size:14px;
+font-size:15px;
 }
 
 .header-actions{
@@ -94,7 +102,7 @@ gap:12px;
 
 button,
 label{
-padding:12px 18px;
+padding:13px 18px;
 border-radius:16px;
 border:1px solid var(--border);
 background:var(--card);
@@ -102,9 +110,10 @@ color:var(--text);
 cursor:pointer;
 font-weight:600;
 transition:0.3s ease;
-backdrop-filter:blur(12px);
+backdrop-filter:blur(14px);
 display:flex;
 align-items:center;
+justify-content:center;
 gap:10px;
 }
 
@@ -130,22 +139,22 @@ gap:30px;
 .sidebar{
 background:var(--card);
 border:1px solid var(--border);
-border-radius:30px;
-padding:30px;
-height:fit-content;
+border-radius:32px;
+padding:32px;
 backdrop-filter:blur(20px);
 box-shadow:var(--shadow);
+height:fit-content;
 }
 
 .sidebar h2{
-font-size:34px;
-margin-bottom:10px;
+font-size:48px;
+margin-bottom:16px;
 }
 
 .sidebar p{
 color:var(--muted);
-line-height:1.7;
-margin-bottom:30px;
+line-height:1.8;
+margin-bottom:32px;
 }
 
 .info-grid{
@@ -158,18 +167,18 @@ margin-bottom:35px;
 background:rgba(255,255,255,0.03);
 border:1px solid var(--border);
 padding:18px;
-border-radius:20px;
+border-radius:22px;
 }
 
 .info-box h3{
-font-size:15px;
+font-size:14px;
 margin-bottom:8px;
 color:var(--muted);
 }
 
 .info-box p{
 margin:0;
-font-size:18px;
+font-size:20px;
 color:white;
 }
 
@@ -193,14 +202,14 @@ overflow:hidden;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:20px;
+gap:20px;
+margin-bottom:24px;
 flex-wrap:wrap;
-gap:15px;
 }
 
 .vm-title h2{
-font-size:32px;
-margin-bottom:6px;
+font-size:40px;
+margin-bottom:8px;
 }
 
 .vm-title p{
@@ -214,12 +223,12 @@ flex-wrap:wrap;
 }
 
 .monitor{
-background:#000;
-border-radius:26px;
-padding:18px;
+background:black;
+border-radius:28px;
+padding:20px;
 position:relative;
 overflow:hidden;
-min-height:700px;
+min-height:720px;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -230,11 +239,40 @@ border:1px solid rgba(255,255,255,0.05);
 content:'';
 position:absolute;
 inset:0;
-pointer-events:none;
 background:linear-gradient(rgba(255,255,255,0.03) 50%, transparent 50%);
 background-size:100% 4px;
-mix-blend-mode:overlay;
-opacity:0.12;
+opacity:0.1;
+pointer-events:none;
+}
+
+#loadingScreen{
+position:absolute;
+inset:0;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+background:black;
+z-index:5;
+gap:16px;
+color:white;
+font-size:20px;
+text-align:center;
+}
+
+.loader{
+width:70px;
+height:70px;
+border-radius:50%;
+border:5px solid rgba(255,255,255,0.1);
+border-top:5px solid #7c3aed;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{
+transform:rotate(360deg);
+}
 }
 
 #screen_container{
@@ -244,14 +282,15 @@ display:flex;
 align-items:center;
 justify-content:center;
 overflow:hidden;
-border-radius:14px;
+position:relative;
+z-index:2;
 }
 
 #screen_container canvas{
 max-width:100%;
 height:auto;
 image-rendering:pixelated;
-border-radius:10px;
+border-radius:14px;
 }
 
 .hidden{
@@ -260,7 +299,6 @@ display:none;
 
 .upload-label{
 width:100%;
-justify-content:center;
 }
 
 footer{
@@ -271,12 +309,15 @@ color:var(--muted);
 }
 
 @media(max-width:1200px){
+
 .main-layout{
 grid-template-columns:1fr;
 }
+
 }
 
 @media(max-width:700px){
+
 .vm-actions{
 flex-direction:column;
 width:100%;
@@ -285,36 +326,48 @@ width:100%;
 .vm-actions button,
 .vm-actions label{
 width:100%;
-justify-content:center;
 }
 
 .monitor{
 min-height:450px;
 }
+
 }
 
 </style>
 </head>
+
 <body>
 
 <header>
+
 <div class="navbar">
+
 <div class="logo">
 <h1>Operating System Museum</h1>
 <p>Interactive Virtual Machine Experience</p>
 </div>
 
 <div class="header-actions">
-<button onclick="window.location.href='index.html'">← Back To Museum</button>
-<button class="primary">Windows 95</button>
+<button onclick="window.location.href='index.html'">
+← Back To Museum
+</button>
+
+<button class="primary">
+Windows 95
+</button>
 </div>
+
 </div>
+
 </header>
 
 <div class="main-layout">
 
 <div class="sidebar">
+
 <h2>Windows 95</h2>
+
 <p>
 Experience one of the most influential operating systems in computing history directly from your browser.
 </p>
@@ -345,12 +398,29 @@ Experience one of the most influential operating systems in computing history di
 
 <div class="control-grid">
 
-<button onclick="startVM()">▶ Start Machine</button>
-<button onclick="stopVM()">⏹ Stop Machine</button>
-<button onclick="restartVM()">🔄 Restart Machine</button>
-<button onclick="fullscreenVM()">🖥 Fullscreen</button>
-<button onclick="takeScreenshot()">📸 Screenshot</button>
-<button onclick="sendCtrlAltDel()">⌨ Ctrl + Alt + Del</button>
+<button onclick="startVM()">
+▶ Start Machine
+</button>
+
+<button onclick="stopVM()">
+⏹ Stop Machine
+</button>
+
+<button onclick="restartVM()">
+🔄 Restart Machine
+</button>
+
+<button onclick="fullscreenVM()">
+🖥 Fullscreen
+</button>
+
+<button onclick="takeScreenshot()">
+📸 Screenshot
+</button>
+
+<button onclick="sendCtrlAltDel()">
+⌨ Ctrl + Alt + Del
+</button>
 
 <label class="upload-label">
 💾 Insert Floppy
@@ -363,25 +433,46 @@ Experience one of the most influential operating systems in computing history di
 </label>
 
 </div>
+
 </div>
 
 <div class="vm-container">
 
 <div class="vm-topbar">
+
 <div class="vm-title">
 <h2>Virtual Machine Console</h2>
 <p>Boot preserved operating systems directly in your browser.</p>
 </div>
 
 <div class="vm-actions">
-<button onclick="lockMouse()">🖱 Capture Mouse</button>
-<button onclick="releaseMouse()">🔓 Release Mouse</button>
-<button onclick="saveState()">💾 Save State</button>
+
+<button onclick="lockMouse()">
+🖱 Capture Mouse
+</button>
+
+<button onclick="releaseMouse()">
+🔓 Release Mouse
+</button>
+
+<button onclick="saveState()">
+💾 Save State
+</button>
+
 </div>
+
 </div>
 
 <div class="monitor">
+
+<div id="loadingScreen">
+<div class="loader"></div>
+<h2>Initializing Virtual Machine...</h2>
+<p>Loading Windows 95 image</p>
+</div>
+
 <div id="screen_container"></div>
+
 </div>
 
 </div>
@@ -394,6 +485,30 @@ Operating System Museum • Powered by v86 Browser Virtualization
 
 <script>
 
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+const supabaseClient = supabase.createClient(
+SUPABASE_URL,
+SUPABASE_ANON_KEY
+);
+
+async function checkAuth(){
+
+const { data, error } =
+await supabaseClient.auth.getSession();
+
+if(error || !data.session){
+
+window.location.href = "/login";
+return;
+
+}
+
+}
+
+checkAuth();
+
 let emulator;
 
 function startVM(){
@@ -402,26 +517,29 @@ if(emulator){
 return;
 }
 
+document.getElementById("loadingScreen").style.display = "flex";
+
 emulator = new V86({
 
-wasm_path: "https://copy.sh/v86/build/v86.wasm",
+wasm_path: "/v86/v86.wasm",
 
 memory_size: 64 * 1024 * 1024,
 
 vga_memory_size: 8 * 1024 * 1024,
 
-screen_container: document.getElementById("screen_container"),
+screen_container:
+document.getElementById("screen_container"),
 
 bios: {
-url: "https://copy.sh/v86/bios/seabios.bin"
+url: "/v86/seabios.bin"
 },
 
 vga_bios: {
-url: "https://copy.sh/v86/bios/vgabios.bin"
+url: "/v86/vgabios.bin"
 },
 
 hda: {
-url: "https://copy.sh/v86/images/windows95.img"
+url: "/images/windows95.img"
 },
 
 boot_order: 0x132,
@@ -430,34 +548,54 @@ autostart: true,
 
 });
 
+emulator.add_listener(
+"emulator-ready",
+function(){
+
+document.getElementById(
+"loadingScreen"
+).style.display = "none";
+
+}
+);
+
 }
 
 function stopVM(){
+
 if(emulator){
 emulator.stop();
 }
+
 }
 
 function restartVM(){
+
 if(emulator){
 emulator.restart();
 }
+
 }
 
 function fullscreenVM(){
+
 const elem = document.querySelector('.monitor');
 
 if(elem.requestFullscreen){
 elem.requestFullscreen();
 }
+
 }
 
 function lockMouse(){
-const canvas = document.querySelector('#screen_container canvas');
+
+const canvas =
+document.querySelector('#screen_container canvas');
 
 if(canvas){
 canvas.requestPointerLock();
 }
+
 }
 
 function releaseMouse(){
@@ -465,7 +603,9 @@ document.exitPointerLock();
 }
 
 function sendCtrlAltDel(){
+
 if(emulator){
+
 emulator.keyboard_send_scancodes([
 0x1D,
 0x38,
@@ -474,24 +614,32 @@ emulator.keyboard_send_scancodes([
 0xB8,
 0xD3
 ]);
+
 }
+
 }
 
 function takeScreenshot(){
-const canvas = document.querySelector('#screen_container canvas');
+
+const canvas =
+document.querySelector('#screen_container canvas');
 
 if(!canvas) return;
 
 const link = document.createElement('a');
+
 link.download = 'windows95-screenshot.png';
 link.href = canvas.toDataURL();
+
 link.click();
+
 }
 
 function saveState(){
+
 if(!emulator) return;
 
-emulator.save_state(function(error, state){
+emulator.save_state(function(error,state){
 
 if(error){
 alert('Failed to save state');
@@ -499,18 +647,25 @@ return;
 }
 
 const blob = new Blob([state]);
+
 const link = document.createElement('a');
 
 link.href = URL.createObjectURL(blob);
+
 link.download = 'windows95-state.bin';
+
 link.click();
 
 });
+
 }
 
-const floppyInput = document.getElementById('floppyUpload');
+const floppyInput =
+document.getElementById('floppyUpload');
 
-floppyInput.addEventListener('change', function(e){
+floppyInput.addEventListener(
+'change',
+function(e){
 
 if(!emulator) return;
 
@@ -519,7 +674,7 @@ const file = e.target.files[0];
 if(file){
 
 emulator.set_fda({
-buffer: file
+buffer:file
 });
 
 alert('Floppy inserted successfully');
@@ -528,9 +683,12 @@ alert('Floppy inserted successfully');
 
 });
 
-const cdInput = document.getElementById('cdUpload');
+const cdInput =
+document.getElementById('cdUpload');
 
-cdInput.addEventListener('change', function(e){
+cdInput.addEventListener(
+'change',
+function(e){
 
 if(!emulator) return;
 
@@ -539,7 +697,7 @@ const file = e.target.files[0];
 if(file){
 
 emulator.set_cdrom({
-buffer: file
+buffer:file
 });
 
 alert('CD-ROM inserted successfully');
@@ -548,16 +706,24 @@ alert('CD-ROM inserted successfully');
 
 });
 
-window.addEventListener('keydown', function(e){
+window.addEventListener('keydown',function(e){
 
-if(e.ctrlKey && e.altKey && e.key === 'Delete'){
+if(
+e.ctrlKey &&
+e.altKey &&
+e.key === 'Delete'
+){
+
 e.preventDefault();
 sendCtrlAltDel();
+
 }
 
 if(e.key === 'F11'){
+
 e.preventDefault();
 fullscreenVM();
+
 }
 
 });
