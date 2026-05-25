@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Operating System Museum</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+:root{
+--bg:#050505;
+--bg2:#0f0f12;
+--card:rgba(18,18,18,0.72);
+--border:rgba(255,255,255,0.08);
+--text:#ffffff;
+--muted:#a1a1aa;
+--accent:#7c3aed;
+--accent2:#06b6d4;
+--shadow:0 20px 60px rgba(0,0,0,0.35);
+}
+
+body.light{
+--bg:#f5f7fb;
+--bg2:#ffffff;
+--card:rgba(255,255,255,0.92);
+--border:rgba(0,0,0,0.08);
+--text:#0f172a;
+--muted:#475569;
+--shadow:0 12px 35px rgba(0,0,0,0.08);
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
+overflow-x:hidden;
+transition:0.35s ease;
+min-height:100vh;
+}
+
+body::before{
+content:'';
+position:fixed;
+width:700px;
+height:700px;
+background:radial-gradient(circle,rgba(124,58,237,0.22),transparent 70%);
+top:-300px;
+right:-200px;
+z-index:-2;
+animation:float 10s infinite ease-in-out;
+pointer-events:none;
+}
+
+body::after{
+content:'';
+position:fixed;
+width:650px;
+height:650px;
+background:radial-gradient(circle,rgba(6,182,212,0.15),transparent 70%);
+bottom:-250px;
+left:-200px;
+z-index:-2;
+animation:float 12s infinite ease-in-out;
+pointer-events:none;
+}
+
+body.light::before{
+opacity:0.45;
+}
+
+body.light::after{
+opacity:0.35;
+}
+
+@keyframes float{
+0%{
+transform:translateY(0px);
+}
+50%{
+transform:translateY(30px);
+}
+100%{
+transform:translateY(0px);
+}
+}
+
+header{
+position:sticky;
+top:0;
+z-index:1000;
+backdrop-filter:blur(18px);
+background:rgba(5,5,5,0.72);
+border-bottom:1px solid var(--border);
+transition:0.3s ease;
+}
+
+body.light header{
+background:rgba(255,255,255,0.75);
+}
+
+.navbar{
+max-width:1450px;
+margin:auto;
+padding:22px 24px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:20px;
+}
+
+.logo h1{
+font-size:36px;
+font-weight:900;
+letter-spacing:-1px;
+}
+
+.logo p{
+margin-top:6px;
+color:var(--muted);
+font-size:15px;
+}
+
+.nav-links{
+display:flex;
+gap:28px;
+}
+
+.nav-links a{
+text-decoration:none;
+color:var(--muted);
+font-weight:500;
+transition:0.3s ease;
+}
+
+.nav-links a:hover{
+color:var(--text);
+}
+
+.nav-actions{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+button,
+select{
+padding:13px 18px;
+border-radius:16px;
+border:1px solid var(--border);
+background:var(--card);
+color:var(--text);
+cursor:pointer;
+font-weight:600;
+backdrop-filter:blur(12px);
+transition:0.3s ease;
+}
+
+button:hover{
+transform:translateY(-2px);
+}
+
+.primary{
+background:linear-gradient(135deg,var(--accent),var(--accent2));
+border:none;
+color:white;
+}
+
+.hero{
+max-width:1450px;
+margin:auto;
+padding:80px 24px;
+display:grid;
+grid-template-columns:1.1fr 1fr;
+gap:60px;
+align-items:center;
+min-height:92vh;
+}
+
+.hero-text{
+animation:fadeUp 1s ease;
+}
+
+.hero-badge{
+display:inline-flex;
+align-items:center;
+gap:10px;
+padding:10px 18px;
+border-radius:999px;
+background:var(--card);
+border:1px solid var(--border);
+margin-bottom:30px;
+font-size:14px;
+color:var(--muted);
+backdrop-filter:blur(12px);
+}
+
+.hero h2{
+font-size:92px;
+font-weight:900;
+line-height:1;
+letter-spacing:-4px;
+margin-bottom:28px;
+overflow-wrap:break-word;
+}
+
+.gradient{
+background:linear-gradient(135deg,#7c3aed,#3b82f6,#06b6d4);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.hero p{
+font-size:20px;
+line-height:1.8;
+color:var(--muted);
+max-width:720px;
+margin-bottom:36px;
+}
+
+.hero-buttons{
+display:flex;
+gap:16px;
+flex-wrap:wrap;
+}
+
+.hero-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:22px;
+}
+
+.os-card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:28px;
+overflow:hidden;
+backdrop-filter:blur(14px);
+transition:0.35s ease;
+box-shadow:var(--shadow);
+}
+
+.os-card:hover{
+transform:translateY(-8px) scale(1.02);
+}
+
+.os-card img{
+width:100%;
+height:220px;
+object-fit:cover;
+display:block;
+}
+
+.os-content{
+padding:24px;
+}
+
+.os-content h3{
+font-size:28px;
+margin-bottom:12px;
+}
+
+.os-content p{
+line-height:1.7;
+color:var(--muted);
+}
+
+.section{
+max-width:1450px;
+margin:auto;
+padding:120px 24px;
+}
+
+.section-title{
+font-size:64px;
+font-weight:900;
+line-height:1;
+margin-bottom:24px;
+letter-spacing:-2px;
+}
+
+.section-subtitle{
+max-width:850px;
+font-size:19px;
+line-height:1.8;
+color:var(--muted);
+margin-bottom:55px;
+}
+
+.features{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:24px;
+}
+
+.feature{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:28px;
+padding:36px;
+backdrop-filter:blur(12px);
+transition:0.35s ease;
+box-shadow:var(--shadow);
+}
+
+.feature:hover{
+transform:translateY(-6px);
+}
+
+.feature h3{
+font-size:28px;
+margin-bottom:14px;
+}
+
+.feature p{
+color:var(--muted);
+line-height:1.8;
+}
+
+.timeline{
+display:flex;
+flex-direction:column;
+gap:40px;
+}
+
+.timeline-item{
+border-left:3px solid var(--accent);
+padding-left:26px;
+}
+
+.timeline-item h3{
+font-size:30px;
+margin-bottom:14px;
+}
+
+.timeline-item p{
+line-height:1.8;
+color:var(--muted);
+}
+
+.portal-preview{
+background:linear-gradient(145deg,rgba(124,58,237,0.12),rgba(6,182,212,0.08));
+border:1px solid var(--border);
+border-radius:36px;
+padding:60px;
+backdrop-filter:blur(20px);
+box-shadow:var(--shadow);
+}
+
+.portal-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:24px;
+margin-top:40px;
+}
+
+.portal-card{
+background:rgba(255,255,255,0.04);
+border:1px solid var(--border);
+padding:32px;
+border-radius:26px;
+transition:0.3s ease;
+}
+
+body.light .portal-card{
+background:rgba(255,255,255,0.7);
+}
+
+.portal-card:hover{
+transform:translateY(-5px);
+}
+
+.portal-card h3{
+font-size:24px;
+margin-bottom:14px;
+}
+
+.portal-card p{
+line-height:1.7;
+color:var(--muted);
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:22px;
+margin-top:50px;
+}
+
+.stat{
+background:var(--card);
+border:1px solid var(--border);
+padding:40px;
+border-radius:28px;
+text-align:center;
+backdrop-filter:blur(12px);
+box-shadow:var(--shadow);
+}
+
+.stat h2{
+font-size:58px;
+margin-bottom:10px;
+}
+
+.stat p{
+color:var(--muted);
+}
+
+footer{
+margin-top:90px;
+padding:45px 20px;
+border-top:1px solid var(--border);
+text-align:center;
+color:var(--muted);
+font-size:15px;
+}
+
+.fade{
+opacity:0;
+transform:translateY(30px);
+transition:all 0.9s ease;
+}
+
+.fade.show{
+opacity:1;
+transform:translateY(0px);
+}
+
+@keyframes fadeUp{
+from{
+opacity:0;
+transform:translateY(30px);
+}
+to{
+opacity:1;
+transform:translateY(0px);
+}
+}
+
+@media(max-width:1200px){
+
+.hero{
+grid-template-columns:1fr;
+}
+
+.hero h2{
+font-size:72px;
+}
+
+}
+
+@media(max-width:750px){
+
+.nav-links{
+display:none;
+}
+
+.hero-grid{
+grid-template-columns:1fr;
+}
+
+.hero h2{
+font-size:54px;
+}
+
+.section-title{
+font-size:46px;
+}
+
+.navbar{
+flex-wrap:wrap;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="navbar">
+
+<div class="logo">
+<h1>Operating System Museum</h1>
+<p>Interactive preservation of computing history.</p>
+</div>
+
+<div class="nav-links">
+<a href="#explore">Explore</a>
+<a href="#timeline">Timeline</a>
+<a href="#portal">Portal</a>
+<a href="#community">Community</a>
+</div>
+
+<div class="nav-actions">
+
+<select id="themeSwitcher">
+<option value="system">System</option>
+<option value="dark">Dark</option>
+<option value="light">Light</option>
+</select>
+
+<button onclick="window.location.href='login.html'">Log In</button>
+
+<button class="primary" onclick="window.location.href='signup.html'">
+Sign Up
+</button>
+
+</div>
+
+</div>
+</header>
+
+<section class="hero">
+
+<div class="hero-text">
+
+<div class="hero-badge">
+🖥️ Preserve • Explore • Experience
+</div>
+
+<h2>
+Preserving The
+<span class="gradient">History</span>
+Of Operating Systems.
+</h2>
+
+<p>
+Explore decades of computing history directly from your browser. Boot preserved operating systems, experience forgotten interfaces, discover digital archaeology, and interact with restored software archives through a modern preservation platform.
+</p>
+
+<div class="hero-buttons">
+<button class="primary">Explore Museum</button>
+<button>Read Documentation</button>
+</div>
+
+</div>
+
+<div class="hero-grid">
+
+<div class="os-card fade">
+<img src="https://upload.wikimedia.org/wikipedia/en/e/eb/Windows_95_at_first_run.png">
+
+<div class="os-content">
+<h3>Windows 95</h3>
+<p>The operating system that transformed desktop computing forever.</p>
+</div>
+</div>
+
+<div class="os-card fade">
+<img src="https://upload.wikimedia.org/wikipedia/en/5/50/Apple_Macintosh_Desktop.png">
+
+<div class="os-content">
+<h3>Macintosh System 1</h3>
+<p>One of the earliest graphical desktop environments ever created.</p>
+</div>
+</div>
+
+<div class="os-card fade">
+<img src="https://gdm-catalog-fmapi-prod.imgix.net/ProductScreenshot/730cafe8-d81a-4ddb-a685-3f58289cdcf1.png">
+
+<div class="os-content">
+<h3>Linux Distributions</h3>
+<p>Explore the evolution of open-source operating systems.</p>
+</div>
+</div>
+
+<div class="os-card fade">
+<img src="https://imgs.search.brave.com/WTP3PJG2wUEihvaJ0tQWw07BtJlpK1D5yuaxd6hG27k/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy85/LzlkL01TLURPU182/LjIyLmpwZw">
+
+<div class="os-content">
+<h3>MS-DOS</h3>
+<p>Experience command-line computing from the foundations of personal computers.</p>
+</div>
+</div>
+
+</div>
+
+</section>
+
+<section class="section fade" id="explore">
+
+<h2 class="section-title">
+Interactive Preservation Platform
+</h2>
+
+<p class="section-subtitle">
+The Operating System Museum combines browser-based virtualization, software preservation, historical research, and community interaction into a modern digital museum experience.
+</p>
+
+<div class="features">
+
+<div class="feature">
+<h3>Browser Virtualization</h3>
+<p>Launch preserved operating systems directly inside your browser using emulation technologies.</p>
+</div>
+
+<div class="feature">
+<h3>Software Archive</h3>
+<p>Preserve abandoned applications, games, utilities, and historical software ecosystems.</p>
+</div>
+
+<div class="feature">
+<h3>Historical Timeline</h3>
+<p>Explore decades of operating system evolution from UNIX to modern mobile platforms.</p>
+</div>
+
+<div class="feature">
+<h3>Community Forums</h3>
+<p>Discuss retro computing, restoration projects, and digital archaeology.</p>
+</div>
+
+<div class="feature">
+<h3>Machine Recreation</h3>
+<p>Experience authentic recreations of historical computing environments.</p>
+</div>
+
+<div class="feature">
+<h3>User Collections</h3>
+<p>Create personalized galleries of preserved operating systems and software.</p>
+</div>
+
+</div>
+
+</section>
+
+<section class="section fade" id="timeline">
+
+<h2 class="section-title">
+Evolution Of Computing
+</h2>
+
+<div class="timeline">
+
+<div class="timeline-item">
+<h3>1970s — UNIX & Mainframes</h3>
+<p>The foundations of modern operating systems emerged from research institutions and UNIX systems.</p>
+</div>
+
+<div class="timeline-item">
+<h3>1980s — Personal Computing Revolution</h3>
+<p>MS-DOS, Macintosh, and AmigaOS transformed how people interacted with computers.</p>
+</div>
+
+<div class="timeline-item">
+<h3>1990s — GUI Revolution</h3>
+<p>Windows and Linux desktop environments brought graphical computing mainstream.</p>
+</div>
+
+<div class="timeline-item">
+<h3>2000s — Internet Era</h3>
+<p>Operating systems evolved around networking, internet connectivity, and multimedia.</p>
+</div>
+
+</div>
+
+</section>
+
+<section class="section fade" id="portal">
+
+<div class="portal-preview">
+
+<h2 class="section-title">
+Portal & Identity System
+</h2>
+
+<p class="section-subtitle">
+Powered by Plum Identity, users can create accounts, save virtual machines, preserve snapshots, and build personalized archives.
+</p>
+
+<div class="portal-grid">
+
+<div class="portal-card">
+<h3>Saved Machines</h3>
+<p>Resume preserved operating systems and continue sessions across devices.</p>
+</div>
+
+<div class="portal-card">
+<h3>Forum Profiles</h3>
+<p>Create profiles and interact with the preservation community.</p>
+</div>
+
+<div class="portal-card">
+<h3>Achievements</h3>
+<p>Unlock exploration milestones and restoration badges.</p>
+</div>
+
+<div class="portal-card">
+<h3>Collections</h3>
+<p>Curate favorite operating systems and preserved software.</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="section fade" id="community">
+
+<h2 class="section-title">
+Museum Statistics
+</h2>
+
+<div class="stats">
+
+<div class="stat">
+<h2>120+</h2>
+<p>Operating Systems</p>
+</div>
+
+<div class="stat">
+<h2>4,000+</h2>
+<p>Archived Applications</p>
+</div>
+
+<div class="stat">
+<h2>1M+</h2>
+<p>Lines Of Preserved Code</p>
+</div>
+
+<div class="stat">
+<h2>24/7</h2>
+<p>Browser Accessibility</p>
+</div>
+
+</div>
+
+</section>
+
+<footer>
+Operating System Museum • Powered by browser emulation and digital preservation.
+</footer>
+
+<script>
+
+const themeSwitcher = document.getElementById('themeSwitcher');
+
+function applyTheme(theme){
+
+if(theme === 'light'){
+document.body.classList.add('light');
+}
+
+else if(theme === 'dark'){
+document.body.classList.remove('light');
+}
+
+else{
+
+const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+if(prefersLight){
+document.body.classList.add('light');
+}
+
+else{
+document.body.classList.remove('light');
+}
+
+}
+
+localStorage.setItem('theme',theme);
+
+}
+
+const savedTheme = localStorage.getItem('theme') || 'system';
+
+applyTheme(savedTheme);
+
+themeSwitcher.value = savedTheme;
+
+themeSwitcher.addEventListener('change',(e)=>{
+applyTheme(e.target.value);
+});
+
+const observer = new IntersectionObserver(entries => {
+
+entries.forEach(entry => {
+
+if(entry.isIntersecting){
+entry.target.classList.add('show');
+}
+
+});
+
+});
+
+document.querySelectorAll('.fade').forEach(el=>{
+observer.observe(el);
+});
+
+</script>
+
+</body>
+</html>
