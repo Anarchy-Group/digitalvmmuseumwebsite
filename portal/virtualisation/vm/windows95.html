@@ -392,29 +392,7 @@ Experience one of the most influential operating systems in computing history di
 Operating System Museum • Powered by v86 Browser Virtualization
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-
-const SUPABASE_URL = "";
-const SUPABASE_ANON_KEY = "";
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-async function checkAuth(){
-
-const { data, error } = await supabaseClient.auth.getSession();
-
-if(error || !data.session){
-window.location.href = '/login';
-return;
-}
-
-console.log('Authenticated user:', data.session.user.email);
-
-}
-
-checkAuth();
 
 let emulator;
 
