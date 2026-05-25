@@ -11,7 +11,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<script src="/cdn/v86/libv86.js"></script>
+<script src="./cdn/v86/libv86.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -521,7 +521,7 @@ document.getElementById("loadingScreen").style.display = "flex";
 
 emulator = new V86({
 
-wasm_path: "/cdn/v86/v86.wasm",
+wasm_path: "./cdn/v86/v86.wasm",
 
 memory_size: 64 * 1024 * 1024,
 
@@ -531,11 +531,11 @@ screen_container:
 document.getElementById("screen_container"),
 
 bios: {
-url: "/cdn/v86/seabios.bin"
+url: "./cdn/v86/seabios.bin"
 },
 
 vga_bios: {
-url: "/cdn/v86/vgabios.bin"
+url: "./cdn/v86/vgabios.bin"
 },
 
 hda: {
