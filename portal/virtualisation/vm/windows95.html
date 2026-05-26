@@ -517,11 +517,27 @@ if(emulator){
 return;
 }
 
+console.log("Starting VM...");
+
 document.getElementById("loadingScreen").style.display = "flex";
+
+try {
 
 emulator = new V86({
 
-wasm_path: "./cdn/v86/v86.wasm",
+wasm_path: "../v86/v86.wasm",
+
+bios: {
+url: "../v86/seabios.bin"
+},
+
+vga_bios: {
+url: "../v86/vgabios.bin"
+},
+
+cdrom: {
+url: "../images/freedos.iso"
+},
 
 memory_size: 64 * 1024 * 1024,
 
@@ -530,37 +546,59 @@ vga_memory_size: 8 * 1024 * 1024,
 screen_container:
 document.getElementById("screen_container"),
 
-bios: {
-url: "./cdn/v86/seabios.bin"
-},
+boot_order: 0x213,
 
-vga_bios: {
-url: "./cdn/v86/vgabios.bin"
-},
-
-hda: {
-url: "https://github.com/Anarchy-Group/digitalvmmuseumwebsite/releases/download/Operating-Systems/freedos.iso"
-},
-
-boot_order: 0x132,
+disable_jit: true,
 
 autostart: true,
 
 });
 
-emulator.add_listener(
-"emulator-ready",
-function(){
+console.log("V86 instance created");
+
+emulator.add_listener("emulator-ready", function(){
+
+console.log("Emulator ready");
 
 document.getElementById(
 "loadingScreen"
 ).style.display = "none";
 
-}
+});
+
+emulator.add_listener("download-progress", function(e){
+
+console.log(
+"Download progress:",
+e.file_name,
+e.loaded,
+"/",
+e.total
 );
 
+});
+
+emulator.add_listener("download-error", function(e){
+
+console.error("Download failed:", e);
+
+});
+
+emulator.add_listener("emulator-stopped", function(){
+
+console.log("Emulator stopped");
+
+});
+
+}
+catch(err){
+
+console.error("VM crashed during init:", err);
+
 }
 
+}
+  
 function stopVM(){
 
 if(emulator){
