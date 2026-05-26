@@ -11,7 +11,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<script src="..../cdn/v86/libv86.js"></script>
+<script src="https://osm.magicplum.co.uk/cdn/v86/libv86.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -529,15 +529,15 @@ emulator = new V86({
 wasm_path: "../v86/v86.wasm",
 
 bios: {
-url: "../v86/seabios.bin"
+url: "https://osm.magicplum.co.uk/cdn/v86/seabios.bin"
 },
 
 vga_bios: {
-url: "../v86/vgabios.bin"
+url: "https://osm.magicplum.co.uk/cdn/v86/vgabios.bin"
 },
 
 cdrom: {
-url: "../images/freedos.iso"
+url: "https://github.com/Anarchy-Group/digitalvmmuseumwebsite/releases/download/Operating-Systems/freedos.iso"
 },
 
 memory_size: 64 * 1024 * 1024,
